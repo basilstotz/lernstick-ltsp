@@ -4,7 +4,7 @@ CONFIG="/home/.config"
 
 #avahi does not work on wlan!
 get_server(){
-    SRV=$(avahi-browse -rtp _ltsp-ssh._tcp | grep -q "=;")
+    SRV=$(avahi-browse -rtp _ltsp-ssh._tcp|grep  "=;.*;IPv4;.*"|head -n1|cut -d";" -f8)
     if test -n "$SRV";then
 	SERVER=$SRV
 	echo "SERVER=$SERVER" > $CONFIG/server
