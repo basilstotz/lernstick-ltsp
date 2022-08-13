@@ -50,14 +50,14 @@ Config (){
     CONFIG="/home/.config"
     if test -f $CONFIG/login/passwd; then
 	TMP=$(mktemp -d)
-	cd $CONFIG
-	./pwmerge $CONFIG/login /etc/ $TMP/
+	#cd $CONFIG
+	/usr/local/sbin/pwmerge $CONFIG/login /etc/ $TMP/
 	cp -a $TMP/* /etc/
 	rm -r $TMP
 
 	#prevent running these ...
 	#touch /var/lib/live/config/live-debconfig_passwd
-        #touch /var/lib/live/config/user-setup
+        touch /var/lib/live/config/user-setup
 	#touch /var/lib/live/config/sudo
     fi
 }
