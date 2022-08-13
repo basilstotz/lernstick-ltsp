@@ -28,7 +28,7 @@ case "$1" in
 	systemctl enable  ltsp-update-config.service
 
 	#no autologin
-	if [ -z $2 ] ; then
+	if [ -z "$2" ] ; then
 	#only on first install 
             if [ -e /var/lib/live/config/gdm3 ] ; then
                 echo -n "Deactivating autologin for GDM ... "
@@ -42,6 +42,10 @@ case "$1" in
 
 	#pam_mkhomedir
 
+	#no updates
+	dconf write /org/gnome/software/allow-updates false
+	dconf write /org/gnome/software/download-updates false
+	
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
