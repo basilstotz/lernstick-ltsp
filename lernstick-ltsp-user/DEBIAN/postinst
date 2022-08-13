@@ -28,7 +28,7 @@ case "$1" in
 	systemctl enable  ltsp-update-config.service
 
 	#no autologin
-	if [ -z "$2" ] ; then
+	#if [ -z "$2" ] ; then
 	#only on first install 
             if [ -e /var/lib/live/config/gdm3 ] ; then
                 echo -n "Deactivating autologin for GDM ... "
@@ -38,10 +38,16 @@ case "$1" in
                 echo "live-guest" > /var/lib/live/config/gdm3
                 echo "done."
             fi
-        fi
+
+	    #no userlist
+	    if test -f /etc/gdm3/greeter.dconf-defaults; then
+               sed -e "s/^.*disable-user-list.*$/disable-user-list=true/g" -i /etc/gdm3/greeter.dconf-defaults
+            fi
+        #fi
 
 	#pam_mkhomedir
-
+        pam-auth-update --package --enable mkhomedir
+	    
 	#no updates
 	dconf write /org/gnome/software/allow-updates false
 	dconf write /org/gnome/software/download-updates false
