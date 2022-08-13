@@ -1,0 +1,69 @@
+#!/bin/sh
+
+#. /lib/live/config.sh
+
+## live-config(7) - System Configuration Components
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+#set -e
+
+#LIVE_CONFIG_CMDLINE=$(cat /proc/cmdline)
+
+Cmdline ()
+{
+	# Reading kernel command line
+	for _PARAMETER in ${LIVE_CONFIG_CMDLINE}
+	do
+		case "${_PARAMETER}" in
+			live-config.locales=*|locales=*)
+				LIVE_LOCALES="${_PARAMETER#*locales=}"
+				;;
+		esac
+	done
+}
+
+Init ()
+{
+	# Checking if a locale package is installed
+	if ! pkg_is_installed "locales" && \
+	   ! pkg_is_installed "locales-all"
+	then
+		exit 0
+	fi
+	# Checking if the locale has already been configured
+	if component_was_executed "locales"
+	then
+		exit 0
+	fi
+
+	echo -n " locales"
+}
+
+
+Config (){
+    CONFIG="/home/.config"
+    if test -f $CONFIG/login/passwd; then
+	TMP=$(mktemp -d)
+	cd $CONFIG
+	./pwmerge $CONFIG/login /etc/ $TMP/
+	cp -a $TMP/* /etc/
+	rm -r $TMP
+
+	#prevent running these ...
+	#touch /var/lib/live/config/live-debconfig_passwd
+        #touch /var/lib/live/config/user-setup
+	#touch /var/lib/live/config/sudo
+    fi
+}
+
+
+
+#Cmdline
+#Init
+Config

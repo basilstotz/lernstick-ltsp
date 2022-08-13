@@ -1,0 +1,15 @@
+PHONY: all
+all: package copy
+
+.PHONY: package
+package:
+	@find . -name ltsp-upda_\*_amd64.deb -exec rm \{\} \;
+	@./bin/package.sh
+
+
+
+.PHONY: copy
+copy: package
+	@rm ~/git/edu-desktop/patch/basis/debs.d/ltsp-org-updater*.deb
+	@cp ltsp-org-updater*.deb ~/git/edu-desktop/patch/basis/debs.d/.
+
