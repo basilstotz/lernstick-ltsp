@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/local/sbin/ltsp-update-config
+ExecStart=/usr/local/sbin/ltsp-update
 
 [Install]
 WantedBy=multi-user.target

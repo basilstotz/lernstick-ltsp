@@ -25,32 +25,7 @@ set -e
 case "$1" in
     configure)
 
-	systemctl enable  ltsp-update-config.service
-
-	#only on first install 
-	#if [ -z "$2" ] ; then
-	    #no autologin
-            if [ -e /var/lib/live/config/gdm3 ] ; then
-                echo -n "Deactivating autologin for GDM ... "
-                sed -i -e "s|^AutomaticLoginEnable=true\$|AutomaticLoginEnable=false|" \
-                    -e "s|^TimedLoginEnable=true\$|TimedLoginEnable=false|" \
-                    /etc/gdm3/daemon.conf
-                echo "live-guest" > /var/lib/live/config/gdm3
-                echo "done."
-            fi
-
-	    #no userlist
-	    if test -f /etc/gdm3/greeter.dconf-defaults; then
-               sed -e "s/^.*disable-user-list.*$/disable-user-list=true/g" -i /etc/gdm3/greeter.dconf-defaults
-            fi
-        #fi
-
-	#pam_mkhomedir
-        pam-auth-update --package --enable mkhomedir
-	    
-	#no updates
-	dconf write /org/gnome/software/allow-updates false
-	dconf write /org/gnome/software/download-updates false
+	/usr/local/sbin/ltsp-setup
 	
     ;;
 
