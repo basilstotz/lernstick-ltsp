@@ -1,0 +1,83 @@
+#!/bin/bash
+
+SRC="$1"
+DEST="$2"
+
+if test -z "$DEST" -o -z "$SRC" ;then
+    echo "usage: pwfilter <srcdir> <dstdir>"
+    exit 1
+fi
+
+
+#UID_MIN=$(grep  "^UID_MIN.*$" /etc/login.defs |xargs|cut -d" " -f2)
+#UID_MAX=$(grep  "^UID_MAX.*$" /etc/login.defs |xargs|cut -d" " -f2)
+#GID_MIN=$(grep  "^GID_MIN.*$" /etc/login.defs |xargs|cut -d" " -f2)
+#GID_MAX=$(grep  "^GID_MAX.*$" /etc/login.defs |xargs|cut -d" " -f2)
+
+UID_MIN=10000
+UID_MAX=20000
+GID_MIN=10000
+GID_MAX=20000
+
+#echo "UID_MIN=$UID_MIN"
+#echo "UID_MAX=$UID_MAX"
+#echo "GID_MIN=$GID_MIN"
+#echo "GID_MAX=$GID_MAX"
+
+#passwd
+list=":"
+while  read line; do
+    uid=$(echo $line|cut -d: -f3)
+    if test $uid -ge $UID_MIN -a $uid -le $UID_MAX; then
+	user=$(echo $line|cut -d: -f1)
+	list="$list$user:"
+    else
+	echo $line > $DEST/passwd 
+    fi	
+done < $SRC/passwd
+echo $list
+
+#shadow
+test=":"
+while  read line; do
+    user=$(echo $line|cut -d: -f1)
+    if [[ "$list" =~  ":$user:" ]] ; then
+	test="$test$user:"
+    else
+	echo $line > $DEST/shadow
+    fi	
+done < $SRC/shadow
+if test "$test" != "$list";then
+    echo "error: lists not same"
+    exit 1
+fi
+
+
+#group
+list=":"
+while  read line; do
+    gid=$(echo $line|cut -d: -f3)
+    if test $gid -ge $GID_MIN -a $gid -le $GID_MAX; then
+	group=$(echo $line|cut -d: -f1)
+	list="$list$group:"
+    else
+	echo $line > $DEST/group
+    fi	
+done < $SRC/group
+echo $list
+
+#gshadow
+test=":"
+while  read line; do
+    group=$(echo $line|cut -d: -f1)
+    if [[ "$list" =~ ":$group:" ]]; then
+	test="$test$group:"
+    else
+	echo $line > $DEST/gshadow
+    fi	
+done < $SRC/gshadow
+if test "$test" != "$list";then
+    echo "error: lists not same"
+    exit 1
+fi
+exit 0
