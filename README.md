@@ -1,1 +1,1 @@
-# lernstick-ltsp-user
+# lernstick-ltsp-conf
