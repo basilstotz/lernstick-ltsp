@@ -1,6 +1,7 @@
 #!/bin/sh
 
 CONFIG="/home/.config"
+mkdir -p $CONFIG/login
 
 
 get_server_ip(){
