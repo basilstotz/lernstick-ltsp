@@ -21,7 +21,7 @@ Config (){
 	fi
       
 	rm -r $TMP1
-	rm -t $TMP2
+	rm -r $TMP2
     fi
 }
 

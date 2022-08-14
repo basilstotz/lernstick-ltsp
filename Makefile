@@ -1,5 +1,5 @@
 PHONY: all
-all: package 
+all: package hook 
 
 .PHONY: package
 package:
@@ -8,8 +8,10 @@ package:
 
 
 
-#.PHONY: copy
-#copy: package
-#	@rm ~/git/edu-desktop/patch/basis/debs.d/ltsp-org-updater*.deb
-#	@cp ltsp-org-updater*.deb ~/git/edu-desktop/patch/basis/debs.d/.
+.PHONY: hook
+hook:
+	@./bin/make-live-hook.sh > lernstick-ltsp-hook
+	@chmod +x lernstick-ltsp-hook
+	@scp lernstick-ltsp-hook amxach@www.amxa.ch:public_html/debian/lernstick-ltsp-hook
+
 
