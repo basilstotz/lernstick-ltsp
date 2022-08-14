@@ -2,8 +2,8 @@
 
 CONFIG="/home/.config"
 
-#avahi does not work on wlan!
-get_server(){
+
+get_server_ip(){
     SRV=$(avahi-browse -rtp _ltsp-ssh._tcp|grep  "=;.*;IPv4;.*"|head -n1|cut -d";" -f8)
     if test -n "$SRV";then
 	SERVER=$SRV
@@ -13,6 +13,7 @@ get_server(){
     fi
 }    
 
+#configure wlan
 if nm-online -s -q;then
     if test -f $CONFIG/wlan;then
 	. $CONFIG/wlan
@@ -23,18 +24,21 @@ if nm-online -s -q;then
     fi
 fi
 
+
 if nm-online -q -t 3600; then
 
+    #configure network
     if test -f $CONFIG/server;then
 	. $CONFIG/server
 	if ! ping -c1 $SERVER 2>&1 >/dev/null;then
-	    get_server
+	    get_server_ip
 	fi
     else
-	get_server
+	get_server_ip
     fi
 
-    if test "$SERVER" != "0.0.0.0" ; then
+    #update config from server
+    if test "$SERVER" != "0.0.0.0" && ping -c1 $SERVER 2>&1 >/dev/null; then
 	mkdir -p $CONFIG
 	TMP=$(mktemp)
 	if wget -O $TMP http://$SERVER:8000/config.tgz; then

@@ -27,9 +27,9 @@ case "$1" in
 
 	systemctl enable  ltsp-update-config.service
 
-	#no autologin
-	#if [ -z "$2" ] ; then
 	#only on first install 
+	#if [ -z "$2" ] ; then
+	    #no autologin
             if [ -e /var/lib/live/config/gdm3 ] ; then
                 echo -n "Deactivating autologin for GDM ... "
                 sed -i -e "s|^AutomaticLoginEnable=true\$|AutomaticLoginEnable=false|" \

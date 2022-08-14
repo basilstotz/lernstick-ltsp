@@ -3,7 +3,7 @@ Section: unknown
 Priority: extra
 Maintainer: Basil Stotz <stotz@amxa.ch>
 Package: lernstick-ltsp-user
-Version: 1660374515 
+Version: 1660462034 
 Architecture: amd64
 Depends: curl 
 Description: Setup and maintain a LTSP server on debian (and maybe ubuntu)
