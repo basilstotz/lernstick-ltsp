@@ -3,7 +3,7 @@ all: package
 
 .PHONY: package
 package:
-	@find . -name lernstick-ltsp-user_\*_amd64.deb -exec rm \{\} \;
+	@find . -name lernstick-ltsp-conf_\*_amd64.deb -exec rm \{\} \;
 	@./bin/package.sh
 
 

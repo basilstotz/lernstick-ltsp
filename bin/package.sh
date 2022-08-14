@@ -1,6 +1,6 @@
 #!/bin/sh
 
-NAME="lernstick-ltsp-user"
+NAME="lernstick-ltsp-conf"
 VERSION=$(date +%s)
 
 test -d $NAME/DEBIAN || mkdir -p $NAME/DEBIAN
