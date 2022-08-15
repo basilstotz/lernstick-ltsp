@@ -3,50 +3,27 @@
 CONFIG="/home/.config"
 mkdir -p $CONFIG/login
 
-
-get_server_ip(){
-    SRV=$(avahi-browse -rtp _ltsp-ssh._tcp|grep  "=;.*;IPv4;.*"|head -n1|cut -d";" -f8)
-    if test -n "$SRV";then
-	SERVER=$SRV
-	echo "SERVER=$SERVER" > $CONFIG/server
-    else
-	SERVER="0.0.0.0"
-    fi
-}    
-
 #configure wlan
 if nm-online -s -q;then
     if test -f $CONFIG/wlan;then
 	. $CONFIG/wlan
 	if nmcli radio wifi on;then
 	    nmcli device wifi connect $SSID password $PASSWORD
-	    sleep 4
+	    sleep 2
 	fi
     fi
 fi
 
-
+#update config from server
 if nm-online -q -t 3600; then
-
-    #configure network
-    if test -f $CONFIG/server;then
-	. $CONFIG/server
-	if ! ping -c1 $SERVER 2>&1 >/dev/null;then
-	    get_server_ip
-	fi
-    else
-	get_server_ip
-    fi
-
-    #update config from server
-    if test "$SERVER" != "0.0.0.0" && ping -c1 $SERVER 2>&1 >/dev/null; then
-	mkdir -p $CONFIG
+    SERVER=$(ltsp-find)
+    if test "$SERVER" != ""; then
+	echo "SERVER=$SERVER" > $CONFIG/server
 	TMP=$(mktemp)
 	if wget -O $TMP http://$SERVER:8000/config.tgz; then
 	    tar -xzf $TMP -C $CONFIG
-	    rm $TMP
 	fi
+	rm $TMP
     fi    
-
 fi
 

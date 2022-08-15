@@ -1,0 +1,29 @@
+#!/bin/sh
+
+SERVER=""
+for C in $(nmcli -g TYPE,DEVICE,UUID c s  --active --order type|xargs); do
+ 	case $C in
+ 	    *wireless*)
+		nmcli c m "$(echo $C|cut -d: -f3)" connection.metered true
+ 		if test -z "$SERVER";then
+ 			#echo -n "wireless: "
+ 			DEVICE=$(echo "$C"|cut -d: -f2)
+ 			DNS=$(ip route|grep "$DEVICE"|cut -d\  -f3)
+ 			SERVER=$(host server "$DNS"|grep address|cut -d\  -f4)
+ 			SERVER=$(host server "$SERVER"|grep address|cut -d\  -f4)
+ 		fi
+ 		;;
+ 	    *ethernet*)
+		nmcli c m "$(echo $C|cut -d: -f3)" connection.metered true
+ 		if test -z "$SERVER";then
+ 			#echo -n "ethernet: "
+ 			SERVER=$(avahi-browse -rtp _ltsp-ssh._tcp|grep "=;.*;IPv4;.*"|cut -d";" -f8)
+ 		fi
+ 		;;
+	    *)
+		;;
+ 	esac  
+done
+echo $SERVER
+
+exit 0

@@ -25,7 +25,14 @@ systemctl enable  ltsp-update.service
 pam-auth-update --package --enable mkhomedir
 
 #no updates
-dconf write /org/gnome/software/allow-updates false
-dconf write /org/gnome/software/download-updates false
+cat <<EOF > /etc/dconf/db/local.d/10-no-autoupdates
+[org/gnome/software]
+allow-updates=false
+download-udates=false
+download-updates-notify=false
+EOF
+EOF
+
+dconf update
 
 exit 0

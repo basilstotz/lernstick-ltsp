@@ -1,7 +1,8 @@
 #!/bin/sh
 
 NAME="lernstick-ltsp-conf"
-VERSION=$(date +%s)
+VERSION=$(date +%Y-%m-%d-%H%M%S)
+#VERSION=$(date +%s)
 
 test -d $NAME/DEBIAN || mkdir -p $NAME/DEBIAN
 cat <<EOF > $NAME/DEBIAN/control

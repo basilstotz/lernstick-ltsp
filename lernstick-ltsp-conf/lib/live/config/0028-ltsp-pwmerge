@@ -8,16 +8,16 @@ Config (){
 	TMP1=$(mktemp -d)
 	TMP2=$(mktemp -d)
 	
-	if /usr/local/sbin/pwfilter /etc $TMP2; then
-	    /usr/local/sbin/pwmerge $CONFIG/login $TMP2 $TMP1
-	    cp -a $TMP1/* /etc
+	if /usr/local/sbin/pwfilter /etc $TMP1; then
+	    /usr/local/sbin/pwmerge $CONFIG/login $TMP1 $TMP2
+	    cp -a $TMP2/* /etc
 	    
 	    #prevent running these ...
 	    #touch /var/lib/live/config/live-debconfig_passwd
 	    touch /var/lib/live/config/user-setup
 	    #touch /var/lib/live/config/sudo
 	else
-	    echo "error: cloud not filter"
+	    echo "error: something went wrong"
 	fi
       
 	rm -r $TMP1

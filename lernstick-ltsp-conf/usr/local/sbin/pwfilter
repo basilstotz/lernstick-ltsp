@@ -50,7 +50,7 @@ while  read line; do
     fi	
 done < $SRC/shadow
 if test "$test" != "$list";then
-    echo "error: lists not same"
+    echo "error: user lists not same"
     exit 1
 fi
 
@@ -81,7 +81,7 @@ while  read line; do
     fi	
 done < $SRC/gshadow
 if test "$test" != "$list";then
-    echo "error: lists not same"
+    echo "error: group lists not same"
     exit 1
 fi
 exit 0

@@ -11,7 +11,7 @@ fi
 
 if test -f /home/.config/server;then
    . /home/.config/server
-   if ping -c1 "$SERVER" 2>&1 >/dev/null;then
+   if ping -c1 -W1 "$SERVER" 2>&1 >/dev/null;then
       ort="ssh://$USER@$SERVER/home/$USER"
       echo "$ort $USER on LTSP" >> $TMP
    fi
