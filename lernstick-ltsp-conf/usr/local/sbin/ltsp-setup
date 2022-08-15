@@ -31,7 +31,7 @@ allow-updates=false
 download-udates=false
 download-updates-notify=false
 EOF
-EOF
+
 
 dconf update
 
