@@ -38,6 +38,9 @@ download-updates=false
 download-updates-notify=false
 EOF
 
+echo " >> disable ltsp-setup.service"
+systemctl disable ltsp-setup.service
+
 echo "done"
 
 

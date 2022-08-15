@@ -1,0 +1,10 @@
+[Unit]
+Description=LTSP Update Config
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/ltsp-setup
+
+[Install]
+WantedBy=multi-user.target

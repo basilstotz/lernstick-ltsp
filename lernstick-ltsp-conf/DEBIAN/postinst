@@ -26,6 +26,7 @@ case "$1" in
     configure)
 
 	systemctl disable  ltsp-update.service
+	systemctl emacs  ltsp-update.service
 	
     ;;
 
