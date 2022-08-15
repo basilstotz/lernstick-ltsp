@@ -38,12 +38,11 @@ download-updates=false
 download-updates-notify=false
 EOF
 
+dconf update
+
 echo " >> disable ltsp-setup.service"
 systemctl disable ltsp-setup.service
 
 echo "done"
-
-
-dconf update
 
 exit 0

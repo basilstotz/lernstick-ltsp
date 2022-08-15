@@ -28,7 +28,7 @@ Init ()
 Config ()
 {
 
-	/usr/local/sbin/ltsp-setup
+	systemctl enable ltsp-setup.service 
         
 	# Creating state file
 	touch /var/lib/live/config/ltsp-setup
