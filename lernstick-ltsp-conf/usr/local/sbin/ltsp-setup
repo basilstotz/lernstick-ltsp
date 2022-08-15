@@ -1,7 +1,11 @@
 #!/bin/sh
 
+echo "running ltsp-setup ..."
+
+echo " >> enable ltsp-update.service"
 systemctl enable  ltsp-update.service
 
+echo " >> configure gdm"
 #only on first install 
 #if [ -z "$2" ] ; then
     #no autologin
@@ -21,9 +25,11 @@ systemctl enable  ltsp-update.service
     fi
 #fi
 
+echo " >> configure pam_mkhomedir"
 #pam_mkhomedir
 pam-auth-update --package --enable mkhomedir
 
+echo " >> configure dconf"
 #no updates
 cat <<EOF > /etc/dconf/db/local.d/10-no-autoupdates
 [org/gnome/software]
@@ -31,6 +37,8 @@ allow-updates=false
 download-updates=false
 download-updates-notify=false
 EOF
+
+echo "done"
 
 
 dconf update
