@@ -28,7 +28,7 @@ pam-auth-update --package --enable mkhomedir
 cat <<EOF > /etc/dconf/db/local.d/10-no-autoupdates
 [org/gnome/software]
 allow-updates=false
-download-udates=false
+download-updates=false
 download-updates-notify=false
 EOF
 
