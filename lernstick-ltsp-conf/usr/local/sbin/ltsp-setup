@@ -2,28 +2,9 @@
 
 echo "running ltsp-setup ..."
 
-echo " >> enable ltsp-update.service"
+echo " >> enable and start ltsp-update.service"
 systemctl enable  ltsp-update.service
-
-echo " >> configure gdm"
-#only on first install 
-#if [ -z "$2" ] ; then
-    #no autologin
-    if [ -e /var/lib/live/config/gdm3 ] ; then
-	echo -n "Deactivating autologin for GDM ... "
-	sed -i -e "s|^AutomaticLoginEnable=true\$|AutomaticLoginEnable=false|" \
-	    -e "s|^TimedLoginEnable=true\$|TimedLoginEnable=false|" \
-	    /etc/gdm3/daemon.conf
-	#???????
-	echo "live-guest" > /var/lib/live/config/gdm3
-	echo "done."
-    fi
-
-    #no userlist
-    if test -f /etc/gdm3/greeter.dconf-defaults; then
-       sed -e "s/^.*disable-user-list.*$/disable-user-list=true/g" -i /etc/gdm3/greeter.dconf-defaults
-    fi
-#fi
+systemctl start ltsp-update.service
 
 echo " >> configure pam_mkhomedir"
 #pam_mkhomedir

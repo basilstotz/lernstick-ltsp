@@ -13,11 +13,19 @@
 
 #set -e
 
+Cmdline(){
+    if grep -q ltsp-server /proc/cmdline ;then
+	
+	touch /var/lib/live/config/ltsp-setup
+	exit 0
+	
+    fi
+}
 
 Init ()
 {
         #check if allready done
-        if test -f /var/lib/live/config/ltsp-setup
+        if test -f /var/lib/live/config/ltsp-setup -o -f /etc/ltsp/ltsp.conf
 	then
 		exit 0
 	fi
@@ -36,6 +44,6 @@ Config ()
 	echo "done"
 }
 
-#Cmdline
+Cmdline
 Init
 Config

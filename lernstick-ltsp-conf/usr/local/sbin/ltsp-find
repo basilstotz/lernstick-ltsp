@@ -8,9 +8,13 @@ for C in $(nmcli -g TYPE,DEVICE,UUID c s  --active --order type|xargs); do
  		if test -z "$SERVER";then
  			#echo -n "wireless: "
  			DEVICE=$(echo "$C"|cut -d: -f2)
- 			DNS=$(ip route|grep "$DEVICE"|cut -d\  -f3)
- 			SERVER=$(host server "$DNS"|grep address|cut -d\  -f4)
- 			SERVER=$(host server "$SERVER"|grep address|cut -d\  -f4)
+ 			ROUTER=$(ip route|grep "$DEVICE"|cut -d\  -f3)
+			if test -n "$ROUTER";then
+ 			    SERVER=$(host server "$ROUTER"|grep address|cut -d\  -f4)
+			fi
+			if test -n "$SERVER";then
+ 			    SERVER=$(host server "$SERVER"|grep address|cut -d\  -f4)
+			fi
  		fi
  		;;
  	    *ethernet*)

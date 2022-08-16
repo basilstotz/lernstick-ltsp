@@ -22,6 +22,7 @@ if nm-online -q -t 3600; then
 	TMP=$(mktemp)
 	if wget -O $TMP http://$SERVER:8000/config.tgz; then
 	    tar -xzf $TMP -C $CONFIG
+	    /lib/live/config/0028-ltsp-pwmerge
 	fi
 	rm $TMP
     fi    

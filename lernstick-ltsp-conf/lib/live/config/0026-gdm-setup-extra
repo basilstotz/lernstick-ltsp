@@ -1,0 +1,60 @@
+#!/bin/sh
+
+#. /lib/live/config.sh
+
+## live-config(7) - System Configuration Components
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+#set -e
+
+
+Init ()
+{
+        #check if allready done
+        if test -f /var/lib/live/config/gdm-setup-extra
+	then
+		exit 0
+	fi
+
+	echo -n " ltlsp-setup ..."
+}
+
+Config ()
+{
+
+echo " >> configure gdm"
+	#only on first install 
+	#if [ -z "$2" ] ; then
+	    #no autologin
+	    if [ -e /var/lib/live/config/gdm3 ] ; then
+		echo -n "Deactivating autologin for GDM ... "
+		sed -i -e "s|^AutomaticLoginEnable=true\$|AutomaticLoginEnable=false|" \
+		    -e "s|^TimedLoginEnable=true\$|TimedLoginEnable=false|" \
+		    /etc/gdm3/daemon.conf
+		#???????
+		echo "live-guest" > /var/lib/live/config/gdm3
+		echo "done."
+	    fi
+
+	    #no userlist
+	    if test -f /etc/gdm3/greeter.dconf-defaults; then
+	       sed -e "s/^.*disable-user-list.*$/disable-user-list=true/g" -i /etc/gdm3/greeter.dconf-defaults
+	    fi
+	#fi
+
+        
+	# Creating state file
+	touch /var/lib/live/config/gdm-setup-extra
+	
+	echo "done"
+}
+
+#Cmdline
+Init
+Config
