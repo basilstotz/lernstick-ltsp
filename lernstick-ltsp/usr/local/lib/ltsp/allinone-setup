@@ -5,9 +5,9 @@ echo "running ltsp-allinone-setup ..."
 . /home/.config/hosttype
 
 if test "$HOSTTYPE" = "laptop";then
-    echo " >> enable and start ltsp-update.service"
-    systemctl enable  ltsp-laptop-update.service
-    systemctl start ltsp-laptop-update.service
+    #echo " >> enable and start ltsp-update.service"
+    #systemctl enable  ltsp-laptop-update.service
+    #systemctl start ltsp-laptop-update.service
 
     echo " >> configure pam_mkhomedir"
     #pam_mkhomedir
@@ -43,9 +43,9 @@ EOF
 
 else
 
-    if ! parted /dev/sda2 print|grep -q ext4;then
+#    if ! parted /dev/sda2 print|grep -q ext4;then
 	mkfs.ext4 -L ltsp /dev/sda2
-    fi
+#    fi
     
     ltsp-org-updater --install
 fi

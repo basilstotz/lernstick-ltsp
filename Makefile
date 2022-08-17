@@ -3,7 +3,7 @@ all: package hook
 
 .PHONY: package
 package:
-	@find . -name lernstick-ltsp-conf_\*_amd64.deb -exec rm \{\} \;
+	@find . -name lernstick-ltsp_\*_amd64.deb -exec rm \{\} \;
 	@./bin/package.sh
 
 
@@ -12,6 +12,6 @@ package:
 hook:
 	@./bin/make-live-hook.sh > lernstick-ltsp-hook
 	@chmod +x lernstick-ltsp-hook
-	@scp lernstick-ltsp-hook amxach@www.amxa.ch:public_html/debian/lernstick-ltsp-hook
+#	@scp lernstick-ltsp-hook amxach@www.amxa.ch:public_html/debian/lernstick-ltsp-hook
 
 

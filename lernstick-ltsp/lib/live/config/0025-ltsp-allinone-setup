@@ -51,7 +51,7 @@ Config ()
 
     mkdir -p /home/.config/
     
-    if test "$LIVE_LTSPSERVER"; then
+    if test -n "$LIVE_LTSPSERVER"; then
 	#ltsp-server
 
 	#set hosttype=server

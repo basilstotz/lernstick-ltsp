@@ -25,7 +25,7 @@ set -e
 case "$1" in
     configure)
 
-	systemctl disable  ltsp-allinone-init.service
+	systemctl enable  ltsp-allinone-init.service
 	systemctl disable  ltsp-allinone-setup.service
 	
     ;;
