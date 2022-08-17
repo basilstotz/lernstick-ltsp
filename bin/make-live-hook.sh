@@ -4,7 +4,7 @@ echo "#!/bin/sh"
 echo ""
 echo "cat <<EOF | base64 -d | tar -x -z -f - -C /"
 
-cd lernstick-ltsp-conf
+cd lernstick-ltsp
 tar -c -z -f - etc/ usr/ lib/ | base64
 
 echo "EOF"

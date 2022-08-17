@@ -58,8 +58,8 @@ Config ()
 	echo "HOSTTYPE=server" > /home/.config/hosttype
     
 	# make superuser
-	useradd   $(echo $LIVE_LTSPSERVER|cut -d: -f1)
-	echo $LIVE_LTSPSERVER|chpasswd
+	useradd --groups sudo --create-home --shell /usr/bin/bash --uid 1001 --user-group  ltsp
+	echo "ltsp:$LIVE_LTSPSERVER"|chpasswd
 
 	# change hostname
 	
@@ -70,7 +70,7 @@ Config ()
 	echo "HOSTTYPE=laptop" > /home/.config/hosttype
 
 	#enable ltsp-laptop-update
-	systemctl enable ltsp-laptop-update.service
+	#systemctl enable ltsp-laptop-update.service
     fi
 
     systemctl enable ltsp-allinone-setup.service

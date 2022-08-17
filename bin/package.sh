@@ -1,6 +1,6 @@
 #!/bin/sh
 
-NAME="lernstick-ltsp-conf"
+NAME="lernstick-ltsp"
 VERSION=$(date +%Y-%m-%d-%H%M%S)
 #VERSION=$(date +%s)
 

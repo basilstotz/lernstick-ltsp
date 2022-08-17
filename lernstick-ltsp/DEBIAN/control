@@ -1,10 +1,10 @@
-Source: lernstick-ltsp-conf
+Source: lernstick-ltsp
 Section: unknown
 Priority: extra
 Maintainer: Basil Stotz <stotz@amxa.ch>
-Package: lernstick-ltsp-conf
-Version: 2022-08-16-150251 
+Package: lernstick-ltsp
+Version: 2022-08-17-104341 
 Architecture: amd64
-Depends: curl 
+Depends: curl,ltsp-org-updater 
 Description: Setup and maintain a LTSP server on debian (and maybe ubuntu)
  Setup and maintain a LTSP server on ubuntu/debian (and maybe ubuntu) 
