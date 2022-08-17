@@ -44,10 +44,10 @@ EOF
 else
 
 #    if ! parted /dev/sda2 print|grep -q ext4;then
-	mkfs.ext4 -L ltsp /dev/sda2
+	mkfs.ext4 -s -L ltsp /dev/sda2
 #    fi
     
-    ltsp-org-updater --install
+    /usr/local/sbin/ltsp-org-updater --install
 fi
 
 

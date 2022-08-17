@@ -61,7 +61,11 @@ Config ()
 	useradd --groups sudo --create-home --shell /usr/bin/bash --uid 1001 --user-group  ltsp
 	echo "ltsp:$LIVE_LTSPSERVER"|chpasswd
 
+        # reformat /dev/sda2
+	mkfs.ext4 -s -L ltsp /dev/sda2
+
 	# change hostname
+        hostnamectl set-hostname ltsp
 	
     else
 	#ltsp-laptop
@@ -73,7 +77,7 @@ Config ()
 	#systemctl enable ltsp-laptop-update.service
     fi
 
-    systemctl enable ltsp-allinone-setup.service
+    #systemctl enable ltsp-allinone-setup.service
 
     #to be removed
     echo "root:VKvdB."|chpasswd

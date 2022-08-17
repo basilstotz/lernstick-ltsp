@@ -1,6 +1,8 @@
 #!/bin/sh
 
-SERVER=""
+SERVER=
+
+#find /etc/NetworkManager/system-connections/ -type f -exec rm \{\} \;
 for C in $(nmcli -g TYPE,DEVICE,UUID c s  --active --order type|xargs); do
  	case $C in
  	    *wireless*)
