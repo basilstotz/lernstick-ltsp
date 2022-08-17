@@ -13,7 +13,7 @@ Maintainer: Basil Stotz <stotz@amxa.ch>
 Package: $NAME
 Version: $VERSION 
 Architecture: amd64
-Depends: curl 
+Depends: curl,ltsp-org-updater 
 Description: Setup and maintain a LTSP server on debian (and maybe ubuntu)
  Setup and maintain a LTSP server on ubuntu/debian (and maybe ubuntu) 
 EOF
