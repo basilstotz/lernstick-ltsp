@@ -3,7 +3,7 @@
 SERVER=
 
 #find /etc/NetworkManager/system-connections/ -type f -exec rm \{\} \;
-for C in $(nmcli -g TYPE,DEVICE,UUID c s  --active --order type|xargs); do
+for C in $(nmcli -g TYPE,DEVICE,UUID connection show  --active --order type|xargs); do
  	case $C in
  	    *wireless*)
 		nmcli c m "$(echo $C|cut -d: -f3)" connection.metered true
@@ -16,6 +16,10 @@ for C in $(nmcli -g TYPE,DEVICE,UUID c s  --active --order type|xargs); do
 			fi
 			if test -n "$SERVER";then
  			    SERVER=$(host server "$SERVER"|grep address|cut -d\  -f4)
+			fi
+			# finally try in the same net with avahi
+			if test -z "$SERVER";then
+			    SERVER=$(avahi-browse -rtp _ltsp-ssh._tcp|grep "=;.*;IPv4;.*"|cut -d";" -f8)
 			fi
  		fi
  		;;
