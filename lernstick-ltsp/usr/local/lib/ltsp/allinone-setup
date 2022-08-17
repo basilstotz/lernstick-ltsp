@@ -42,6 +42,11 @@ mv $TMP $CONFIG/bookmarks
 EOF
 
 else
+
+    if ! parted /dev/sda2 print|grep -q ext4;then
+	mkfs.ext4 -L ltsp /dev/sda2
+    fi
+    
     ltsp-org-updater --install
 fi
 
