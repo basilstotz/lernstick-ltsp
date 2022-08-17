@@ -1,29 +1,34 @@
 #!/bin/sh
 
-echo "running ltsp-allinone-setup ..."
+test -f /home/.config/hosttype || exit 1
 
-. /home/.config/hosttype
+#setup: runs once
+if ! test -f /home/.config/installed;then
+    mkdir -p /home/.config
+    
+    echo "running ltsp-allinone-setup ..."
+    . /home/.config/hosttype
 
-if test "$HOSTTYPE" = "laptop";then
-    #echo " >> enable and start ltsp-update.service"
-    #systemctl enable  ltsp-laptop-update.service
-    #systemctl start ltsp-laptop-update.service
+    if test "$HOSTTYPE" = "laptop";then
+	#echo " >> enable and start ltsp-update.service"
+	#systemctl enable  ltsp-laptop-update.service
+	#systemctl start ltsp-laptop-update.service
 
-    echo " >> configure pam_mkhomedir"
-    #pam_mkhomedir
-    pam-auth-update --package --enable mkhomedir
+	echo " >> configure pam_mkhomedir"
+	#pam_mkhomedir
+	pam-auth-update --package --enable mkhomedir
 
-    echo " >> configure dconf"
-    #no updates
-    cat <<EOF > /etc/dconf/db/local.d/10-no-autoupdates
+	echo " >> configure dconf"
+	#no updates
+	cat <<EOF > /etc/dconf/db/local.d/10-no-autoupdates
 [org/gnome/software]
 allow-updates=false
 download-updates=false
 download-updates-notify=false
 EOF
-    dconf update
+	dconf update
 
-    cat <<'EOF' > /etc/profile.d/ltsp-homedir-bookmark.sh
+	cat <<'EOF' > /etc/profile.d/ltsp-homedir-bookmark.sh
 TMP=$(mktemp)
 CONFIG="$HOME/.config/gtk-3.0"
 if test -f $CONFIG/bookmarks;then 
@@ -41,20 +46,29 @@ fi
 mv $TMP $CONFIG/bookmarks
 EOF
 
-else
+    else
+	/usr/local/sbin/ltsp-org-updater --install
+    fi
 
-#    if ! parted /dev/sda2 print|grep -q ext4;then
-	mkfs.ext4 -s -L ltsp /dev/sda2
-#    fi
-    
-    /usr/local/sbin/ltsp-org-updater --install
+    echo "done"
+
+    touch /home/.config/installed
 fi
 
+#init: runs on ervery start
+if test -f /home/.config/installed;then
+    echo -n "running ltsp-allinone-init ..."
 
+    . /home/.config/hosttype
 
-echo " >> disable ltsp-setup.service"
-systemctl disable ltsp-allinone-setup.service
-
-echo "done"
+    if test "$HOSTTYPE" = "laptop";then
+	echo "laptop"
+	/usr/local/lib/ltsp/laptop-update
+    else
+	echo "server"
+    fi
+else
+    exit 1
+fi
 
 exit 0

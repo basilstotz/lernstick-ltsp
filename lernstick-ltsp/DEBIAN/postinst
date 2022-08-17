@@ -25,7 +25,6 @@ set -e
 case "$1" in
     configure)
 
-	systemctl enable  ltsp-allinone-init.service
 	systemctl enable  ltsp-allinone-setup.service
 	
     ;;

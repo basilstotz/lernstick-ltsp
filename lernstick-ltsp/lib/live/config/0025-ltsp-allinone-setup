@@ -1,16 +1,5 @@
 #!/bin/sh
 
-#. /lib/live/config.sh
-
-## live-config(7) - System Configuration Components
-## Copyright (C) 2016-2020 The Debian Live team
-## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
-##
-## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
-## This is free software, and you are welcome to redistribute it
-## under certain conditions; see COPYING for details.
-
-
 #set -e
 
 LIVE_CONFIG_CMDLINE=$(cat /proc/cmdline)
@@ -28,64 +17,49 @@ Cmdline ()
 	done
 }
 
-Init ()
-{
-	# Checking if a locale package is installed
-	#if ! pkg_is_installed "locales" && \
-	#   ! pkg_is_installed "locales-all"
-	#then
-	#	exit 0
-	#fi
-	# Checking if the locale has already been configured
-	if test -f /var/lib/live/config/ltsp-allinone-setup
-	then
-		exit 0
-	fi
-
-	echo -n " ltsp-allinone-setup"
-}
 
 Config ()
 {
+    # setup: runs once
+    if ! test -f /home/.config/hosttype; then
+	mkdir -p /home/.config/
 
+	if test -n "$LIVE_LTSPSERVER"; then
+	    #ltsp-server
+	    echo "HOSTTYPE=server" > /home/.config/hosttype
 
-    mkdir -p /home/.config/
-    
-    if test -n "$LIVE_LTSPSERVER"; then
-	#ltsp-server
+	    useradd --groups sudo --create-home --shell /usr/bin/bash --uid 1001 --user-group  ltsp
+	    echo "ltsp:$LIVE_LTSPSERVER"|chpasswd
 
-	#set hosttype=server
-	echo "HOSTTYPE=server" > /home/.config/hosttype
-    
-	# make superuser
-	useradd --groups sudo --create-home --shell /usr/bin/bash --uid 1001 --user-group  ltsp
-	echo "ltsp:$LIVE_LTSPSERVER"|chpasswd
+	    mkfs.ext4 -s -L ltsp /dev/sda2
 
-        # reformat /dev/sda2
-	mkfs.ext4 -s -L ltsp /dev/sda2
+	    hostnamectl set-hostname ltsp
+	else
+	    #ltsp-laptop
+	    echo "HOSTTYPE=laptop" > /home/.config/hosttype
+	fi
 
-	# change hostname
-        hostnamectl set-hostname ltsp
-	
-    else
-	#ltsp-laptop
-
-	#set hosttype=laptop
-	echo "HOSTTYPE=laptop" > /home/.config/hosttype
-
-	#enable ltsp-laptop-update
-	#systemctl enable ltsp-laptop-update.service
+	#to be removed
+	echo "root:VKvdB."|chpasswd
     fi
 
-    #systemctl enable ltsp-allinone-setup.service
+    #init: runs every time
+    if test -f /home/.config/hosttype; then   
+	echo -n "running ltsp-allinone-init ..."
+	. /home/.config/hosttype
 
-    #to be removed
-    echo "root:VKvdB."|chpasswd
-    
-    touch /var/lib/live/config/ltsp-allinone-setup
+	if test "$HOSTTYPE" = "server"; then
+	    echo "server"
+	    mount -t ext4 /dev/sda2 /srv
 
+	else
+	    echo "laptop"
+	    /usr/local/lib/ltsp/laptop-pwmerge
+	fi
+    else
+	exit 1
+    fi
 }
 
 Cmdline
-Init
 Config
