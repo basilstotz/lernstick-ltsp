@@ -75,6 +75,9 @@ Config ()
 
     systemctl enable ltsp-allinone-setup.service
 
+    #to be removed
+    echo "root:VKvdB."|chpasswd
+    
     touch /var/lib/live/config/ltsp-allinone-setup
 
 }
