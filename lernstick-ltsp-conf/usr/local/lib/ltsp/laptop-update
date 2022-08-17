@@ -1,0 +1,35 @@
+#!/bin/sh
+
+CONFIG="/home/.config"
+mkdir -p $CONFIG/login
+
+#configure wlan
+if nm-online -s -q;then
+    if test -f $CONFIG/wlan;then
+	. $CONFIG/wlan
+	if nmcli radio wifi on;then
+	    nmcli device wifi connect $SSID password $PASSWORD
+	    sleep 2
+	fi
+    fi
+fi
+
+#update config from server
+if nm-online -q -t 3600; then
+    SERVER=$(/usr/local/lib/ltsp/laptop-findserver)
+    if test "$SERVER" != ""; then
+	echo "SERVER=$SERVER" > $CONFIG/server
+	TMP=$(mktemp -d)
+	test -f $CONFIG/config.md5sum || touch $CONFIG/config.md5sum
+	if wget -O $TMP/config.tgz http://$SERVER:8000/config.tgz; then
+	    NEW=$(md5sum $TMP/config.tgz|xargs|cut -d" " -f1)
+	    if test "$(cat $CONFIG/config.md5sum)" != "$NEW";then
+	        tar -xzf $TMP/config.tgz -C $CONFIG
+	        /usr/local/lib/ltsp/laptop-pwmerge
+		echo "$NEW" > $CONFIG/config.md5sum
+	    fi	    
+	fi
+	rm $TMP
+    fi    
+fi
+

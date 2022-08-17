@@ -8,8 +8,8 @@ Config (){
 	TMP1=$(mktemp -d)
 	TMP2=$(mktemp -d)
 	
-	if /usr/local/sbin/pwfilter /etc $TMP1; then
-	    /usr/local/sbin/pwmerge $CONFIG/login $TMP1 $TMP2
+	if /usr/local/lib/ltsp/pwfilter /etc $TMP1; then
+	    /usr/local/lib/ltsp/pwmerge $CONFIG/login $TMP1 $TMP2
 	    cp -a $TMP2/* /etc
 	    
 	    #prevent running these ...

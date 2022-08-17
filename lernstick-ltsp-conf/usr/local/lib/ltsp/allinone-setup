@@ -1,0 +1,55 @@
+#!/bin/sh
+
+echo "running ltsp-allinone-setup ..."
+
+. /home/.config/hosttype
+
+if test "$HOSTTYPE" = "laptop";then
+    echo " >> enable and start ltsp-update.service"
+    systemctl enable  ltsp-laptop-update.service
+    systemctl start ltsp-laptop-update.service
+
+    echo " >> configure pam_mkhomedir"
+    #pam_mkhomedir
+    pam-auth-update --package --enable mkhomedir
+
+    echo " >> configure dconf"
+    #no updates
+    cat <<EOF > /etc/dconf/db/local.d/10-no-autoupdates
+[org/gnome/software]
+allow-updates=false
+download-updates=false
+download-updates-notify=false
+EOF
+    dconf update
+
+    cat <<'EOF' > /etc/profile.d/ltsp-homedir-bookmark.sh
+TMP=$(mktemp)
+CONFIG="$HOME/.config/gtk-3.0"
+if test -f $CONFIG/bookmarks;then 
+    cat $CONFIG/bookmarks | grep -v "ssh://${USER}@.*/home/${USER}" >  $TMP
+else
+    mkdir -p $CONFIG
+fi
+if test -f /home/.config/server;then
+   . /home/.config/server
+   if ping -c1 -W1 "$SERVER" 2>&1 >/dev/null;then
+      ort="ssh://$USER@$SERVER/home/$USER"
+      echo "$ort $USER on LTSP" >> $TMP
+   fi
+fi
+mv $TMP $CONFIG/bookmarks
+EOF
+
+else
+    ltsp-org-updater --install
+fi
+
+
+
+echo " >> disable ltsp-setup.service"
+systemctl disable ltsp-allinone-setup.service
+
+echo "done"
+
+exit 0

@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/local/sbin/ltsp-setup
+ExecStart=/usr/local/lib/ltsp/allinone-setup
 
 [Install]
 WantedBy=multi-user.target

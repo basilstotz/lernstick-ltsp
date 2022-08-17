@@ -1,0 +1,84 @@
+#!/bin/sh
+
+#. /lib/live/config.sh
+
+## live-config(7) - System Configuration Components
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+#set -e
+
+LIVE_CONFIG_CMDLINE=$(cat /proc/cmdline)
+
+Cmdline ()
+{
+	# Reading kernel command line
+	for _PARAMETER in ${LIVE_CONFIG_CMDLINE}
+	do
+		case "${_PARAMETER}" in
+			live-config.ltspserver=*|ltspserver=*)
+				LIVE_LTSPSERVER="${_PARAMETER#*ltspserver=}"
+				;;
+		esac
+	done
+}
+
+Init ()
+{
+	# Checking if a locale package is installed
+	#if ! pkg_is_installed "locales" && \
+	#   ! pkg_is_installed "locales-all"
+	#then
+	#	exit 0
+	#fi
+	# Checking if the locale has already been configured
+	if test -f /var/lib/live/config/ltsp-allinone-setup
+	then
+		exit 0
+	fi
+
+	echo -n " ltsp-allinone-setup"
+}
+
+Config ()
+{
+
+
+    mkdir -p /home/.config/
+    
+    if test "$LIVE_LTSPSERVER"; then
+	#ltsp-server
+
+	#set hosttype=server
+	echo "HOSTTYPE=server" > /home/.config/hosttype
+    
+	# make superuser
+	useradd   $(echo $LIVE_LTSPSERVER|cut -d: -f1)
+	echo $LIVE_LTSPSERVER|chpasswd
+
+	# change hostname
+	
+    else
+	#ltsp-laptop
+
+	#set hosttype=laptop
+	echo "HOSTTYPE=laptop" > /home/.config/hosttype
+
+	#enable ltsp-laptop-update
+	systemctl enable ltsp-laptop-update.service
+    fi
+
+    systemctl enable ltsp-allinone-setup.service
+
+    touch /var/lib/live/config/ltsp-allinone-setup
+
+}
+
+Cmdline
+Init
+Config

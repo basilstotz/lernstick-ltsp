@@ -1,0 +1,21 @@
+#!/bin/sh
+
+
+Config ()
+{
+    echo -n "running ltsp-allinone-init ..."
+    . /home/.config/hosttype
+    
+    if test "$HOSTTYPE" = "server"; then
+	#ltsp-server
+        echo "server"
+	mount -t ext4 /dev/sda2 /srv
+
+    else
+	#ltsp-laptop
+	echo "laptop"
+	/usr/local/lib/ltsp/laptop-pwmerge
+    fi
+}
+
+Config
