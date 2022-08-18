@@ -2,6 +2,8 @@
 
 #set -e
 
+CONFIG="/home/.config"
+
 LIVE_CONFIG_CMDLINE=$(cat /proc/cmdline)
 
 Cmdline ()
@@ -21,31 +23,31 @@ Cmdline ()
 Config ()
 {
     # setup: runs once
-    if ! test -f /home/.config/hosttype; then
-	mkdir -p /home/.config/
+    if ! test -f $CONFIG/hosttype; then
+	mkdir -p $CONFIG/
 
 	if test -n "$LIVE_LTSPSERVER"; then
 	    #ltsp-server
-	    echo "HOSTTYPE=server" > /home/.config/hosttype
+	    echo "HOSTTYPE=server" > $CONFIG/hosttype
 
 	    # add adminuser
 	    useradd --groups sudo --create-home --shell /usr/bin/bash --uid 1001 --user-group  ltsp
 	    echo "ltsp:$LIVE_LTSPSERVER"|chpasswd
-            touch /home/.config/nouserlist
+            touch $CONFIG/nouserlist
 	    
 	    # reformat sda2 to ext4
-	    UHU=$(partx --show --nr 2 /dev/sda |tail -n1|xargs)
-	    START=$(echo $UHU|cut -d" " -f2)
-	    END=$$(echo $UHU|cut -d" " -f3)
-	    parted /dev/sda/ rm 2
-	    parted /dev/sda mkpart primary ext4 ${START}s ${END}s
-	    #mkfs.ext4 -s -L ltsp /dev/sda2
+	    #UHU=$(partx --show --nr 2 /dev/sda |tail -n1|xargs)
+	    #START=$(echo $UHU|cut -d" " -f2)
+	    #END=$(echo $UHU|cut -d" " -f3)
+	    #parted /dev/sda rm 2
+	    #parted /dev/sda mkpart primary ext4 ${START}s ${END}s
+	    echo "y" | mkfs.ext4 /dev/sda2
 
 	    #set hostanme
 	    hostnamectl set-hostname ltsp
 	else
 	    #ltsp-laptop
-	    echo "HOSTTYPE=laptop" > /home/.config/hosttype
+	    echo "HOSTTYPE=laptop" > $CONFIG/hosttype
 	fi
 
 	#to be removed
@@ -53,9 +55,9 @@ Config ()
     fi
 
     #init: runs every time
-    if test -f /home/.config/hosttype; then   
+    if test -f $CONFIG/hosttype; then   
 	echo -n "running ltsp-allinone-init ..."
-	. /home/.config/hosttype
+	. $CONFIG/hosttype
 
 	if test "$HOSTTYPE" = "server"; then
 	    echo "server"

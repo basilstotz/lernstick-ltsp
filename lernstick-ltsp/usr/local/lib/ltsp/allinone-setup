@@ -1,18 +1,17 @@
 #!/bin/sh
 
-test -f /home/.config/hosttype || exit 1
+CONFIG="/home/.config"
+
+test -f $CONFIG/hosttype || exit 1
 
 #setup: runs once
-if ! test -f /home/.config/installed;then
-    mkdir -p /home/.config
+if ! test -f $CONFIG/installed;then
+    mkdir -p $CONFIG
     
     echo "running ltsp-allinone-setup ..."
-    . /home/.config/hosttype
+    . $CONFIG/hosttype
 
     if test "$HOSTTYPE" = "laptop";then
-	#echo " >> enable and start ltsp-update.service"
-	#systemctl enable  ltsp-laptop-update.service
-	#systemctl start ltsp-laptop-update.service
 
 	echo " >> configure pam_mkhomedir"
 	#pam_mkhomedir
@@ -30,11 +29,11 @@ EOF
 
 	cat <<'EOF' > /etc/profile.d/ltsp-homedir-bookmark.sh
 TMP=$(mktemp)
-CONFIG="$HOME/.config/gtk-3.0"
-if test -f $CONFIG/bookmarks;then 
-    cat $CONFIG/bookmarks | grep -v "ssh://${USER}@.*/home/${USER}" >  $TMP
+GTK="$HOME/.config/gtk-3.0"
+if test -f $GTK/bookmarks;then 
+    cat $GTK/bookmarks | grep -v "ssh://${USER}@.*/home/${USER}" >  $TMP
 else
-    mkdir -p $CONFIG
+    mkdir -p $GTK
 fi
 if test -f /home/.config/server;then
    . /home/.config/server
@@ -43,7 +42,7 @@ if test -f /home/.config/server;then
       echo "$ort $USER on LTSP" >> $TMP
    fi
 fi
-mv $TMP $CONFIG/bookmarks
+mv $TMP $GTK/bookmarks
 EOF
 
     else
@@ -52,14 +51,14 @@ EOF
 
     echo "done"
 
-    touch /home/.config/installed
+    touch $CONFIG/installed
 fi
 
 #init: runs on ervery start
-if test -f /home/.config/installed;then
+if test -f $CONFIG/installed;then
     echo -n "running ltsp-allinone-init ..."
 
-    . /home/.config/hosttype
+    . $CONFIG/hosttype
 
     if test "$HOSTTYPE" = "laptop";then
 	echo "laptop"
