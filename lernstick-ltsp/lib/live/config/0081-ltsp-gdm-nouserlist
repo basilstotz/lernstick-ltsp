@@ -22,6 +22,10 @@ Init ()
 		exit 0
 	fi
 
+	if ! test -f /home.config/nouserlist; then
+	    exit 0
+	fi
+	
 	echo -n " ltlsp-setup ..."
 }
 

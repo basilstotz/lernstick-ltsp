@@ -29,7 +29,7 @@ if nm-online -q -t 3600; then
 		echo "$NEW" > $CONFIG/config.md5sum
 	    fi	    
 	fi
-	rm $TMP
+	rm -r $TMP
     fi    
 fi
 

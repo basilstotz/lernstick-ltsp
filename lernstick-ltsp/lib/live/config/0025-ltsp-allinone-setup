@@ -28,11 +28,20 @@ Config ()
 	    #ltsp-server
 	    echo "HOSTTYPE=server" > /home/.config/hosttype
 
+	    # add adminuser
 	    useradd --groups sudo --create-home --shell /usr/bin/bash --uid 1001 --user-group  ltsp
 	    echo "ltsp:$LIVE_LTSPSERVER"|chpasswd
+            touch /home/.config/nouserlist
+	    
+	    # reformat sda2 to ext4
+	    UHU=$(partx --show --nr 2 /dev/sda |tail -n1|xargs)
+	    START=$(echo $UHU|cut -d" " -f2)
+	    END=$$(echo $UHU|cut -d" " -f3)
+	    parted /dev/sda/ rm 2
+	    parted /dev/sda mkpart primary ext4 ${START}s ${END}s
+	    #mkfs.ext4 -s -L ltsp /dev/sda2
 
-	    mkfs.ext4 -s -L ltsp /dev/sda2
-
+	    #set hostanme
 	    hostnamectl set-hostname ltsp
 	else
 	    #ltsp-laptop
