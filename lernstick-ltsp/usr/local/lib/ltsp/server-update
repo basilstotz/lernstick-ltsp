@@ -1,0 +1,33 @@
+#!/bin/sh
+
+# save passwds                                                                                                                                   
+DST="/home/.config"
+mkdir -p $DST/login
+chmod 600 $DST/login
+
+HTML="/var/www/html"
+mkdir -p $HTML
+
+if ! test -f $HTML/config.tgz;then
+    touch $HTML/config.tgz -d "now - 10 years"
+fi
+
+while true; do
+    CHANGE=$(find /etc -maxdepth 1 -type f -name passwd -o -name group -o -name shadow -o -name gshadow -cnewer $HTML/config.tgz)
+    if test -n "$CHANGE";then
+
+	cd $DST
+	
+	test -f /etc/ltsp/wlan.conf && cp /etc/ltsp/wlan.conf wlan
+	cp -a /etc/passwd login/passwd
+	cp -a /etc/group login/group
+	cp -a /etc/shadow login/shadow
+	cp -a /etc/gshadow login/gshadow
+
+	tar -c -z -f $HTML/config.tgz *
+	
+	cd $HTML
+	md5sum config.tgz > config.tgz.md5sum
+    fi
+    sleep 300
+done
