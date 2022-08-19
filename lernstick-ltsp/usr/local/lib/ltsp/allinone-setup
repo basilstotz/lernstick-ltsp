@@ -1,15 +1,16 @@
 #!/bin/sh
 
-CONFIG="/home/.config"
+STATE="/var/local/ltsp"
 
-test -f $CONFIG/hosttype || exit 1
+
+test -f $STATE/hosttype || exit 1
 
 #setup: runs once
-if ! test -f $CONFIG/installed;then
-    mkdir -p $CONFIG
+if ! test -f $STATE/installed;then
+    mkdir -p $STATE
     
     echo "running ltsp-allinone-setup ..."
-    . $CONFIG/hosttype
+    . $STATE/hosttype
 
     if test "$HOSTTYPE" = "laptop";then
 
@@ -46,6 +47,7 @@ mv $TMP $GTK/bookmarks
 EOF
 
     else
+	#server
 	mkdir -p /etc/ltsp
 	cat <<EOF > /etc/ltsp/wlan.conf
 SSID="escuela"
@@ -67,20 +69,24 @@ EOF
  </service-group>
 EOF
 
+	echo "info: uninstall all flatpaks" 
+	flatpak uninstall --all --assumeyes --noninteractive
+	
+        touch $STATE/nouserlist
+	
 	test -e /usr/local/sbin/ltsp-org-updater && /usr/local/sbin/ltsp-org-updater --install
     fi
-    touch /home/.config/nouserlist
     
     echo "done"
 
-    touch $CONFIG/installed
+    touch $STATE/installed
 fi
 
 #init: runs on ervery start
-if test -f $CONFIG/installed;then
+if test -f $STATE/installed;then
     echo -n "running ltsp-allinone-init ..."
 
-    . $CONFIG/hosttype
+    . $STATE/hosttype
 
     if test "$HOSTTYPE" = "laptop";then
 	echo "laptop"

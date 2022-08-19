@@ -13,7 +13,7 @@ if ! test -f $HTML/config.tgz;then
 fi
 
 while true; do
-    CHANGE=$(find /etc -maxdepth 1 -type f -name passwd -o -name group -o -name shadow -o -name gshadow -cnewer $HTML/config.tgz)
+    CHANGE=$(find /etc -maxdepth 1 -type f \( -name passwd -o -name group -o -name shadow -o -name gshadow \) -cnewer $HTML/config.tgz)
     if test -n "$CHANGE";then
 
 	cd $DST

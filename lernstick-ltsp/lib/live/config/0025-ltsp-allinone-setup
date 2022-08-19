@@ -2,7 +2,7 @@
 
 #set -e
 
-CONFIG="/home/.config"
+STATE="/var/local/ltsp"
 
 LIVE_CONFIG_CMDLINE=$(cat /proc/cmdline)
 
@@ -23,12 +23,12 @@ Cmdline ()
 Config ()
 {
     # setup: runs once
-    if ! test -f $CONFIG/hosttype; then
-	mkdir -p $CONFIG/
+    if ! test -f $STATE/hosttype; then
+	mkdir -p $STATE
 
 	if test -n "$LIVE_LTSPSERVER"; then
 	    #ltsp-server
-	    echo "HOSTTYPE=server" > $CONFIG/hosttype
+	    echo "HOSTTYPE=server" > $STATE/hosttype
 
 	    # add admin user
 	    useradd --groups sudo --create-home --shell /usr/bin/bash --uid 1001 --user-group  ltsp
@@ -51,7 +51,7 @@ Config ()
 	 
 	else
 	    #ltsp-laptop
-	    echo "HOSTTYPE=laptop" > $CONFIG/hosttype
+	    echo "HOSTTYPE=laptop" > $STATE/hosttype
 	fi
 
 	#to be removed
@@ -59,9 +59,9 @@ Config ()
     fi
 
     #init: runs every time
-    if test -f $CONFIG/hosttype; then   
+    if test -f $STATE/hosttype; then   
 	echo -n "running ltsp-allinone-init ..."
-	. $CONFIG/hosttype
+	. $STATE/hosttype
 
 	if test "$HOSTTYPE" = "server"; then
 	    echo "server"

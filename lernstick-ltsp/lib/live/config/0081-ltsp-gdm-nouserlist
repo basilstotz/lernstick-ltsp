@@ -22,7 +22,7 @@ Init ()
 		exit 0
 	fi
 
-	if ! test -f /home/.config/nouserlist; then
+	if ! test -f /var/local/ltsp/nouserlist; then
 	    exit 0
 	fi
 	
