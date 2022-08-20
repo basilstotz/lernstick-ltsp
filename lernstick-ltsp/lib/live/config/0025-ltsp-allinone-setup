@@ -46,7 +46,11 @@ Config ()
 	    ##END=$(echo $UHU|cut -d" " -f3)
 	    ##parted /dev/sda rm 2
 	    ##parted /dev/sda mkpart primary ext4 ${START}s ${END}s
-	    echo "y" | mkfs.ext4 /dev/sda2
+
+	    PARTITION=$(df -h|grep persistence|xargs|cut -d" " -f1|sed -e"s/3$/2/g")
+            echo "PARTITION=$PARTITION" > $STATE/partition
+	    
+	    echo "y" | mkfs.ext4 $PARTITION
 
 	 
 	else
@@ -65,8 +69,8 @@ Config ()
 
 	if test "$HOSTTYPE" = "server"; then
 	    echo "server"
-	    mount -t ext4 /dev/sda2 /srv
-
+	    . $STATE/partition
+	    mount -t ext4 $PARTITION /srv
 	else
 	    echo "laptop"
 	    /usr/local/lib/ltsp/laptop-pwmerge
