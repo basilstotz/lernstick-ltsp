@@ -16,7 +16,7 @@ Config (){
 	    #touch /var/lib/live/config/live-debconfig_passwd
 	    touch /var/lib/live/config/user-setup
 	    #touch /var/lib/live/config/sudo
-	    touch $CONFIG/nouserlist
+	    touch /var/local/lib/ltsp/nouserlist
 	else
 	    echo "error: something went wrong"
 	fi
