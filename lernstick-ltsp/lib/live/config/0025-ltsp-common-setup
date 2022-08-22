@@ -1,0 +1,155 @@
+#!/bin/sh
+
+VSTATE="var/local/ltsp"
+
+LIVE_CONFIG_CMDLINE=$(cat /proc/cmdline)
+
+Cmdline ()
+{
+        # Reading kernel command line       
+        for _PARAMETER in ${LIVE_CONFIG_CMDLINE}
+        do
+                case "${_PARAMETER}" in
+                        live-config.profile=*|profile=*)
+                                LIVE_PROFILE="${_PARAMETER#*profile=}"
+                                ;;
+                esac
+        done
+
+        for _PARAMETER in ${LIVE_CONFIG_CMDLINE}
+        do
+                case "${_PARAMETER}" in
+                        live-config.admin=*|admin=*)
+                                LIVE_ADMIN="${_PARAMETER#*admin=}"
+                                ;;
+                esac
+        done
+
+	#get and save profile
+	if -z "$LIVE_PROFILE";then
+	    if -z "$LIVE_ADMIN";then
+		PROFILE="shared"
+	    else
+		PROFILE="personal"
+	    fi
+	else
+	    PROFILE=$LIVE_PROFILE
+	fi	
+}
+
+
+admin_user_add(){
+    ADMIN="$(echo $LIVE_ADMIN|cut -d: -f1)"
+    useradd --groups sudo --create-home --shell /usr/bin/bash --u\
+id 1001 --user-group "$ADMIN" 
+    echo "$LIVE_ADMIN"|chpasswd
+    echo "ADMIN=$ADMIN" > /$VSTATE/admin
+}
+
+
+Cmdline
+
+#runs once
+if ! test -f /$VSTATE/profile;then
+
+    mkdir /$VSTATE
+    echo "PROFILE=$LIVE_PROFILE" > /$VSTATE/profile
+
+    case "$PROFILE" in
+	server)
+	    #make admin user
+	    admin_user_add
+	    #set hosname
+	    hostnamectl set-hostname ltsp
+	    #format exchange partition
+	    PARTITION=$(df -h|grep persistence|xargs|cut -d" " -f1|sed -e"s/3$/2/g")
+            echo "PARTITION=$PARTITION" > /$VSTATE/partition
+
+            echo "y" | mkfs.ext4 $PARTITION
+	    #enable service
+	    systemctl enable ltsp-export-conf.service
+	;;
+	personal)
+	    admin_user_add
+	;;
+	shared)
+	;;
+    esac
+fi
+
+#run every time
+. /$VSTATE/profile
+case $PROFILE in
+    server)
+	. /$VSTATE/partition
+	mount -t ext4 $PARTITION /srv
+	STATE="home/.state"
+	;;
+    personal)
+	STATE="home/.state"
+	;;
+    shared)
+	STATE="run/state"
+	;;
+esac
+
+
+D="$VSTATE"
+if test -d $D ;then
+    if ! test -d "/home/.state/$D";then
+	mkdir -p "/home/.state/$D"
+	rsync -ar "/$D/" "/home/.state/$D"
+    fi
+fi
+if test -d "/home/.state/$D";then
+    mkdir -p "/$D"
+    mount -o bind "/home/.state/$D" "/$D"
+fi
+
+DIRS="etc/cups
+etc/ltsp
+etc/NetworkManager/system-connections
+root"
+
+mkdir -p "/$STATE"
+for D in $DIRS; do
+    if test -d "/$D";then
+        if ! test -d "/$STATE/$D";then
+            mkdir -p "/$STATE/$D"
+            rsync -ar "/$D/" "/$STATE/$D"
+        fi
+    fi
+    if test -d "/$STATE/$D";then
+        mkdir -p "/$D"
+        mount -o bind "/$STATE/$D" "/$D"
+    fi
+done
+
+for F in etc/passwd etc/shadow etc/group etc/gshadow; do
+    if ! test -f "$STATE/$F";then
+        mkdir -p "$(dirname $STATE/$F)"
+        cp -a "/$F" "$STATE/$F"
+        touch /etc/lernstick-passwd-state
+    fi
+done
+
+if test "$PROFILE" = "shared";then
+    if test -f /home/.config/login/passwd; then
+        TMP=$(mktemp -d)
+        /usr/local/lib/ltsp/pwmerge "/home/.config/login" /etc "$TMP"
+        cp -a "$TMP"/* "/$STATE/etc/"
+        rm -r "$TMP"
+    fi
+elif ! test -f /etc/lernstick-passwd-state;then
+    TMP=$(mktemp -d)
+    /usr/local/lib/ltsp/pwmerge "/$STATE/etc" /etc "$TMP"
+    cp -a "$TMP"/* "/$STATE/etc/"
+    touch /etc/lernstick-passwd-state
+    rm -r "$TMP"
+fi
+
+for F in etc/passwd etc/shadow etc/group etc/gshadow; do
+    mount -o bind "/$STATE/$F" "/$F"
+done
+
+exit 0

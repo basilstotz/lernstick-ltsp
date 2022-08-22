@@ -1,18 +1,18 @@
 #!/bin/sh
 
-STATE="/var/local/ltsp"
+VSTATE="var/local/ltsp"
 
 
-test -f $STATE/hosttype || exit 1
+test -f /$VSTATE/profile || exit 1
 
 #setup: runs once
-if ! test -f $STATE/installed;then
-    mkdir -p $STATE
+if ! test -f /$VSTATE/installed;then
+    mkdir -p /$VSTATE
     
     echo "running ltsp-allinone-setup ..."
-    . $STATE/hosttype
+    . /$VSTATE/profile
 
-    if test "$HOSTTYPE" = "laptop";then
+    if test "$PROFILE" = "shared";then
 
 	echo " >> configure pam_mkhomedir"
 	#pam_mkhomedir
@@ -72,23 +72,23 @@ EOF
 	echo "info: uninstall all flatpaks" 
 	flatpak uninstall --all --assumeyes --noninteractive
 	
-        touch $STATE/nouserlist
+        touch /$VSTATE/nouserlist
 	
 	test -e /usr/local/sbin/ltsp-org-updater && /usr/local/sbin/ltsp-org-updater --install
     fi
     
     echo "done"
 
-    touch $STATE/installed
+    touch /$VSTATE/installed
 fi
 
 #init: runs on ervery start
-if test -f $STATE/installed;then
+if test -f /$VSTATE/installed;then
     echo -n "running ltsp-allinone-init ..."
 
-    . $STATE/hosttype
+    . /$VSTATE/profile
 
-    if test "$HOSTTYPE" = "laptop";then
+    if test "$PROFLE" = "shared";then
 	echo "laptop"
 	/usr/local/lib/ltsp/laptop-update
     else

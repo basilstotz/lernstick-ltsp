@@ -1,0 +1,66 @@
+#!/bin/sh
+
+DIRS="etc/cups 
+etc/ltsp 
+etc/NetworkManager/system-connections
+var/local/ltsp
+root"
+
+
+HOSTTYPE="$1"
+
+case "$HOSTTYPE" in
+    server|personal)
+	STATE="home/.state"
+	;;
+    shared)
+	STATE="run/state"
+	;;
+    *)
+	exit 1
+	;;
+esac
+
+mkdir -p "/$STATE"
+for D in $DIRS; do
+    if test -d "/$D";then
+	if ! test -d "/$STATE/$D";then
+	    mkdir -p "/$STATE/$D"
+            rsync -ar "/$D/" "/$STATE/$D"
+	fi
+    fi
+    if test -d "/$STATE/$D";then
+	mkdir -p "/$D"
+	mount -o bind "/$STATE/$D" "/$D"
+    fi
+done
+
+
+for F in etc/passwd etc/shadow etc/group etc/gshadow; do
+    if ! test -f "$STATE/$F";then
+	mkdir -p "$(dirname $STATE/$F)"
+	cp -a "/$F" "$STATE/$F"
+        touch /etc/lernstick-passwd-state
+    fi
+done
+
+if test "$HOSTTYPE" = "shared";then
+    if test -f /home/.config/login/passwd; then
+	TMP=$(mktemp -d)
+	/usr/local/lib/ltsp/pwmerge "/home/.config/login" /etc "$TMP"
+	cp -a "$TMP"/* "/$STATE/etc/"
+	rm -r "$TMP"
+    fi
+elif ! test -f /etc/lernstick-passwd-state;then    
+    TMP=$(mktemp -d)
+    /usr/local/lib/ltsp/pwmerge "/$STATE/etc" /etc "$TMP"
+    cp -a "$TMP"/* "/$STATE/etc/"
+    touch /etc/lernstick-passwd-state
+    rm -r "$TMP"
+fi    
+
+for F in etc/passwd etc/shadow etc/group etc/gshadow; do
+    mount -o bind "/$STATE/$F" "/$F"
+done
+
+exit 0
